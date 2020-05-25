@@ -33,6 +33,11 @@ import org.apache.ibatis.session.SqlSession;
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
+
+/**
+ *
+ *
+ */
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   private static final long serialVersionUID = -4724728412955527868L;
@@ -79,6 +84,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      //如果是Object中方法就直接调用方法本身
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       } else {
@@ -94,12 +100,14 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
       // A workaround for https://bugs.openjdk.java.net/browse/JDK-8161372
       // It should be removed once the fix is backported to Java 8 or
       // MyBatis drops Java 8 support. See gh-1929
+      // 从缓存中获取 MapperMethod 对象，若缓存未命中，则创建 MapperMethod 对象
       MapperMethodInvoker invoker = methodCache.get(method);
       if (invoker != null) {
         return invoker;
       }
 
       return methodCache.computeIfAbsent(method, m -> {
+        // 如果是接口中定义的default方法，创建MapperMethodInvoker实现类DefaultMethodInvoker 基本不用关注
         if (m.isDefault()) {
           try {
             if (privateLookupInMethod == null) {
@@ -112,6 +120,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
             throw new RuntimeException(e);
           }
         } else {
+          // 如果不是接口中定义的default方法，创建MapperMethodInvoker实现类PlainMethodInvoker，在此之前也会创建MapperMethod
           return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
         }
       });
@@ -149,6 +158,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args, SqlSession sqlSession) throws Throwable {
+      // 直接调用MapperMethod的方法，method和proxy的入参被丢弃
       return mapperMethod.execute(sqlSession, args);
     }
   }
