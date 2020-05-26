@@ -26,6 +26,9 @@ public class InterceptorChain {
 
   private final List<Interceptor> interceptors = new ArrayList<>();
 
+  /**
+   * 通用方法 为Executor、StatementHandler、ResultSetHandler、ParameterHandler等安装插件
+   */
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
       target = interceptor.plugin(target);
