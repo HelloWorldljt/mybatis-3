@@ -42,6 +42,11 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     this.configuration = configuration;
   }
 
+  /**
+   * 默认会使用SimpltExecutors，以及autoCommit=false，事务隔离级别为空
+   * 当然我们也可以在入参指定
+   * SIMPLE 就是普通的执行器 默认执行器；REUSE 执行器会重用预处理语句（PreparedStatement）；BATCH 执行器不仅重用语句还会执行批量更新。
+   */
   @Override
   public SqlSession openSession() {
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
@@ -90,10 +95,13 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
+      // 获取Environment中的TransactionFactory和DataSource，用来创建事务对象
       final Environment environment = configuration.getEnvironment();
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      // 创建执行器，并给执行器安装插件
       final Executor executor = configuration.newExecutor(tx, execType);
+      // 创建DefaultSqlSession
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()

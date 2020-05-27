@@ -24,6 +24,7 @@ public interface Interceptor {
 
   Object intercept(Invocation invocation) throws Throwable;
 
+  //接口方法，使用 default 声明
   default Object plugin(Object target) {
     return Plugin.wrap(target, this);
   }
