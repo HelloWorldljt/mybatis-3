@@ -15,8 +15,6 @@
  */
 package org.apache.ibatis.plugin;
 
-import org.apache.ibatis.executor.resultset.ResultSetHandler;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +26,9 @@ public class InterceptorChain {
 
   private final List<Interceptor> interceptors = new ArrayList<>();
 
-  //这是一个相当通用的方法，不是只能给Executor安装插件，后面我们看到的StatementHandler、ResultSetHandler、ParameterHandler等都会被安装插件。
+  /**
+   * 通用方法 为Executor、StatementHandler、ResultSetHandler、ParameterHandler等安装插件
+   */
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
       target = interceptor.plugin(target);
