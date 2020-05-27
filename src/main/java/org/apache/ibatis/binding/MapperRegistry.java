@@ -34,6 +34,9 @@ import org.apache.ibatis.session.SqlSession;
 public class MapperRegistry {
 
   private final Configuration config;
+  /**
+   * Class 为mapper 接口 MapperProxyFactory 即是生产MapperProxy（mapper 代理对象的工厂）
+   */
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
   public MapperRegistry(Configuration config) {
