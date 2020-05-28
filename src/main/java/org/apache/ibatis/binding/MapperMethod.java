@@ -56,8 +56,10 @@ public class MapperMethod {
 
   public Object execute(SqlSession sqlSession, Object[] args) {
     Object result;
+    // 判断属于哪种类型，来决定调用SqlSession的哪个方法
     switch (command.getType()) {
       case INSERT: {
+        // 参数转换
         Object param = method.convertArgsToSqlCommandParam(args);
         result = rowCountResult(sqlSession.insert(command.getName(), param));
         break;
@@ -73,16 +75,21 @@ public class MapperMethod {
         break;
       }
       case SELECT:
+        // 返回void，且入参有ResultHandler
         if (method.returnsVoid() && method.hasResultHandler()) {
           executeWithResultHandler(sqlSession, args);
           result = null;
         } else if (method.returnsMany()) {
+          // 返回类型为数组或List
           result = executeForMany(sqlSession, args);
         } else if (method.returnsMap()) {
+          // 返回类型为Map
           result = executeForMap(sqlSession, args);
         } else if (method.returnsCursor()) {
+          // 返回类型为Cursor
           result = executeForCursor(sqlSession, args);
         } else {
+          // 返回单个实体对象或者Optional对象
           Object param = method.convertArgsToSqlCommandParam(args);
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional()
@@ -97,6 +104,7 @@ public class MapperMethod {
       default:
         throw new BindingException("Unknown execution method for: " + command.getName());
     }
+    // 当方法返回类型为基本类型，但是result却为空，这种情况会抛出异常
     if (result == null && method.getReturnType().isPrimitive() && !method.returnsVoid()) {
       throw new BindingException("Mapper method '" + command.getName()
           + " attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
@@ -273,16 +281,26 @@ public class MapperMethod {
   }
 
   public static class MethodSignature {
-
+    //是否返回数组或者集合
     private final boolean returnsMany;
+    //是否返回map
     private final boolean returnsMap;
+    //是否无返回值
     private final boolean returnsVoid;
+    //是否返回Cursor 游标（Cursor）是处理数据的一种方法，
+    // 为了查看或者处理结果集中的数据，游标提供了在结果集中一次一行或者多行前进或向后浏览数据的能力。
     private final boolean returnsCursor;
+    //是否返回optional
     private final boolean returnsOptional;
+    //mapper接口方法的返回类型
     private final Class<?> returnType;
+    //当返回map 时 MapKey 注解的value
     private final String mapKey;
+    //ResultHandler 的参数索引
     private final Integer resultHandlerIndex;
+    //RowBounds （用于分页）的参数索引
     private final Integer rowBoundsIndex;
+    //入参解析器 存放参数的位置索引和对应的参数名到 map 中
     private final ParamNameResolver paramNameResolver;
 
     public MethodSignature(Configuration configuration, Class<?> mapperInterface, Method method) {
