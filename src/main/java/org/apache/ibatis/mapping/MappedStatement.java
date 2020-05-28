@@ -31,6 +31,10 @@ import org.apache.ibatis.session.Configuration;
 /**
  * @author Clinton Begin
  */
+/**
+ * 在xml配置中,像select,update,delete,insert 都需要提供id号和sql语句以及入参和出参信息,而MappedStatement就是xml到java对象的映射,
+ * 一个<select//>标签就会对应一个MappedStatement对象
+ */
 public final class MappedStatement {
 
   private String resource;

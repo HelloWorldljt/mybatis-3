@@ -45,6 +45,9 @@ import org.apache.ibatis.session.SqlSession;
  *
  * @author Clinton Begin
  */
+/**
+ * SqlSession 用户入口，主要工作还是通过执行器来完成
+ */
 public class DefaultSqlSession implements SqlSession {
 
   private final Configuration configuration;

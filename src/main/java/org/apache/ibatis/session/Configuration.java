@@ -98,17 +98,29 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 /**
  * @author Clinton Begin
  */
+/**
+ * mybatis配置文件对应的类，包含了配置项的get set方法，并且有些初始化默认值
+ */
 public class Configuration {
 
   protected Environment environment;
 
   protected boolean safeRowBoundsEnabled;
   protected boolean safeResultHandlerEnabled = true;
+  /*
+   * 是否启用数据组A_column自动映射到Java类中的驼峰命名的属性
+  */
   protected boolean mapUnderscoreToCamelCase;
   protected boolean aggressiveLazyLoading;
   protected boolean multipleResultSetsEnabled = true;
+  /**
+   * 允许JDBC 生成主键。需要驱动器支持
+   */
   protected boolean useGeneratedKeys;
   protected boolean useColumnLabel = true;
+  /**
+   * 配置全局性的cache开关，默认为true
+   */
   protected boolean cacheEnabled = true;
   protected boolean callSettersOnNulls;
   protected boolean useActualParamName = true;
@@ -116,12 +128,27 @@ public class Configuration {
   protected boolean shrinkWhitespacesInSql;
 
   protected String logPrefix;
+  /**
+   * 指定 MyBatis 所用日志的具体实现，未指定时将自动查找
+   */
   protected Class<? extends Log> logImpl;
   protected Class<? extends VFS> vfsImpl;
+  /**
+   * 设置本地缓存范围，session：就会有数据的共享，statement：语句范围，这样不会有数据的共享
+   */
   protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
+  /**
+   * 设置触发延迟加载的方法
+   */
   protected Set<String> lazyLoadTriggerMethods = new HashSet<>(Arrays.asList("equals", "clone", "hashCode", "toString"));
+  /**
+   * 设置驱动等待数据响应超时数
+   */
   protected Integer defaultStatementTimeout;
+  /**
+   * 设置驱动返回结果数的大小
+   */
   protected Integer defaultFetchSize;
   protected ResultSetType defaultResultSetType;
   protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;

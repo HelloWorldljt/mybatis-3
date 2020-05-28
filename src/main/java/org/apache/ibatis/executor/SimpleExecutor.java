@@ -58,8 +58,12 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      // 创建StatementHandler对象时，会根据StatementType自行判断选择SimpleStatementHandler、PreparedStatementHandler还是CallableStatementHandler实现类
+      // 另外，还会给它安装执行器的所有插件
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+      // 获取Statement对象，并设置参数
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // 执行语句，并映射结果集
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);

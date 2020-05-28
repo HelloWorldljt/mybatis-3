@@ -148,13 +148,17 @@ public class MapperMethod {
   private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
     List<E> result;
     Object param = method.convertArgsToSqlCommandParam(args);
+    // 如果入参包含RowBounds对象，这个一般用于分页使用
     if (method.hasRowBounds()) {
       RowBounds rowBounds = method.extractRowBounds(args);
       result = sqlSession.selectList(command.getName(), param, rowBounds);
     } else {
+      // 不用分页的情况
       result = sqlSession.selectList(command.getName(), param);
     }
     // issue #510 Collections & arrays support
+    // 如果SqlSession方法的返回类型和Mapper方法的返回类型不一致
+    // 例如，mapper返回类型为数组、Collection的其他子类
     if (!method.getReturnType().isAssignableFrom(result.getClass())) {
       if (method.getReturnType().isArray()) {
         return convertToArray(result);
@@ -230,10 +234,15 @@ public class MapperMethod {
     private final SqlCommandType type;
 
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
+      //获取方法名
       final String methodName = method.getName();
+      //获取方法所在的类
       final Class<?> declaringClass = method.getDeclaringClass();
+      //获取映射语句信息
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass,
           configuration);
+      //如果映射语句对象是NULL,那么查看该方法上是否标注了FLUSH标签,如果存在,则设置查询类型为FLUSH,
+      // 否则抛出BindingException异常表示接口找不到定义的方法。
       if (ms == null) {
         if (method.getAnnotation(Flush.class) != null) {
           name = null;
@@ -261,14 +270,20 @@ public class MapperMethod {
 
     private MappedStatement resolveMappedStatement(Class<?> mapperInterface, String methodName,
         Class<?> declaringClass, Configuration configuration) {
+      //获取语句id 形式为接口名.方法名
       String statementId = mapperInterface.getName() + "." + methodName;
+      //判断配置中是否存在该方法id
       if (configuration.hasStatement(statementId)) {
+        //返回映射语句
         return configuration.getMappedStatement(statementId);
       } else if (mapperInterface.equals(declaringClass)) {
+        //如果接口信息就是所在类的话,直接返回NULL
         return null;
       }
+      //获取该类下的所有接口信息
       for (Class<?> superInterface : mapperInterface.getInterfaces()) {
         if (declaringClass.isAssignableFrom(superInterface)) {
+          //从父接口中查找对应的方法ID,下列语句使用递归的方式进行查找
           MappedStatement ms = resolveMappedStatement(superInterface, methodName,
               declaringClass, configuration);
           if (ms != null) {
