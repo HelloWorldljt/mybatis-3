@@ -42,9 +42,12 @@ public class Plugin implements InvocationHandler {
   }
 
   public static Object wrap(Object target, Interceptor interceptor) {
+    // 以被拦截类为key，查找需要被插件拦截的方法
+    // class 既是 @Signature 注解中声明的 type， method 集合 既是注解中 method 属性，会根据args属性筛选重载方法。
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
     Class<?> type = target.getClass();
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
+    //有符合要求的则返回代理对象，否则返回target
     if (interfaces.length > 0) {
       return Proxy.newProxyInstance(
           type.getClassLoader(),
