@@ -36,6 +36,11 @@ import org.apache.ibatis.transaction.TransactionException;
  *
  * @see JdbcTransactionFactory
  */
+/**
+ * @Description  单独使用Mybatis时，默认的事务管理实现类，就和它的名字一样，它就是我们常说的JDBC事务的极简封装
+ * @author lijiangtao
+ * @date 2020/6/3
+ */
 public class JdbcTransaction implements Transaction {
 
   private static final Log log = LogFactory.getLog(JdbcTransaction.class);
@@ -83,9 +88,15 @@ public class JdbcTransaction implements Transaction {
     }
   }
 
+  /**
+   * @Description 不意味着真的要销毁conn 而是要把conn放回连接池 ，供下一次使用
+   * @author lijiangtao
+   * @date 2020/6/3
+   */
   @Override
   public void close() throws SQLException {
     if (connection != null) {
+      //连接可能还要使用，需要重置AutoCommit属性了
       resetAutoCommit();
       if (log.isDebugEnabled()) {
         log.debug("Closing JDBC Connection [" + connection + "]");
