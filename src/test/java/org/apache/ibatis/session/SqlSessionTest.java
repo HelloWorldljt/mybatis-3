@@ -57,7 +57,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
+/**
+ * @Description SqlSessionTest debug 阅读源码比较好的入口
+ * @author lijiangtao
+ * @date 2020/6/3
+ */
 class SqlSessionTest extends BaseDataTest {
   private static SqlSessionFactory sqlMapper;
 
